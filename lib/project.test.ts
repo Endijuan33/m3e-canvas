@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { isProject, projectFileName, readProject } from "./project";
+import { isProject, droppedProjectFile, projectFileName, readProject } from "./project";
 import { updateRail } from "./rail";
 import { KIND_ORDER, VARIANTS, railExpansionSide, type Doc, type Item } from "./tokens";
 
@@ -211,5 +211,33 @@ describe("readProject", () => {
     } finally {
       read.mockRestore();
     }
+  });
+});
+
+describe("droppedProjectFile", () => {
+  const file = (name: string, type = "") => new File(["{}"], name, { type });
+
+  it("returns null when the drop carries no files", () => {
+    expect(droppedProjectFile(null)).toBeNull();
+    expect(droppedProjectFile([])).toBeNull();
+  });
+
+  it("picks the first JSON file among others", () => {
+    const json = file("m3e-canvas Sketch.json");
+    expect(droppedProjectFile([file("photo.png", "image/png"), json, file("notes.txt")])).toBe(json);
+  });
+
+  it("matches the extension without regard to case", () => {
+    const json = file("SKETCH.JSON");
+    expect(droppedProjectFile([json])).toBe(json);
+  });
+
+  it("matches the type when the name carries no extension", () => {
+    const json = file("sketch", "application/json");
+    expect(droppedProjectFile([json])).toBe(json);
+  });
+
+  it("ignores a drop that carries no project file", () => {
+    expect(droppedProjectFile([file("photo.png", "image/png"), file("video.mp4", "video/mp4")])).toBeNull();
   });
 });

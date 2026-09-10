@@ -92,7 +92,7 @@ import { TidyState } from "@/components/ui";
 import { AiSettings, DEFAULT_AI, hasKey, isSecureUrl, loadAiSettings, proposeBehavior, proposeDescription, pushHistory, saveAiSettings } from "@/lib/ai";
 import { barSlotOf, bodyRect, carryFrame, pullInto, tidyFrame } from "@/lib/tidy";
 import { constrainModalRails, modalRailOf, updateRail } from "@/lib/rail";
-import { isProject, readProject, saveProject } from "@/lib/project";
+import { isProject, droppedProjectFile, readProject, saveProject } from "@/lib/project";
 import { hasShareHash, readShareHash } from "@/lib/share";
 import { LoadingIndicator } from "@/components/Loading";
 import { draftDesign } from "@/lib/ai";
@@ -2805,6 +2805,16 @@ export default function Page() {
         else groupSelected();
         return;
       }
+      if (mod && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        saveProject(docRef.current);
+        return;
+      }
+      if (mod && e.key.toLowerCase() === "o") {
+        e.preventDefault();
+        projectFileRef.current?.click();
+        return;
+      }
       if (e.key === " " && !e.repeat) {
         e.preventDefault();
         setSpaceHeld(true);
@@ -3538,6 +3548,16 @@ export default function Page() {
             ref={canvasRef}
             onPointerDown={onCanvasPointerDown}
             onPointerDownCapture={onTouchCapture}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "copy";
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = droppedProjectFile(e.dataTransfer.files);
+              if (!file) return;
+              void readProject(file).then((next) => (next ? setPendingImport(next) : showToast(t("invalidProject", lang), 3000, "error")));
+            }}
             style={{
               position: "absolute",
               inset: isMobile ? 6 : 8,

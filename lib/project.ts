@@ -89,3 +89,9 @@ export async function readProject(file: File): Promise<Doc | null> {
     return null;
   }
 }
+
+/** the file a drop carries, when one of them claims to be a project: JSON by name or type */
+export function droppedProjectFile(files: FileList | File[] | null): File | null {
+  const list = Array.from(files ?? []);
+  return list.find((f) => f.name.toLowerCase().endsWith(".json") || f.type === "application/json") ?? null;
+}
