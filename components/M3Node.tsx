@@ -100,6 +100,8 @@ const NO_BOX: Kind[] = [
   "splitButton",
   "fabMenu",
   "badge",
+  "ellipse",
+  "line",
 ];
 
 /** Padding follows M3: icon+label is tighter than label alone. */
@@ -431,6 +433,13 @@ function Body({ item, p, tabScroll }: { item: Item; p: Palette; tabScroll?: numb
           />
         </div>
       ) : null;
+
+    case "ellipse":
+      /* the shape is its own fill; a true ellipse needs a percentage radius the node's corner helpers cannot say */
+      return <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: p[item.fill ?? "secondaryContainer"] }} />;
+
+    case "line":
+      return <div style={{ width: "100%", height: "100%", borderRadius: sizeOf(item, {}).h / 2, background: p[item.fill ?? "primary"] }} />;
 
     case "iconButton": {
       const s = item.size ?? 48;

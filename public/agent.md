@@ -114,6 +114,8 @@ Sizes are in dp; `size` is the width unless noted. Content width inside the phon
 | `card` | card with image area, title, body | `label`, `supporting`, `icon`, `variant` `filled` (default) / `elevated` / `outlined`, `fill` background token, `size` width, `size2` height, `"noImage": true` to drop the image area, `src` an https picture for it, `action` | 380 × 223 |
 | `listItem` | list item | `label`, `supporting`, `icon` leading, `icon2` trailing, or `"switch": true` for a trailing switch with `checked` as its state, `action` | 380 × 72 |
 | `box` | plain container, or a bottom sheet when `checked` | `size` width, `size2` height, `fill` token, `radiusTop`, `radiusBottom` | 412 × 220 |
+| `ellipse` | flat oval shape, decoration only | `size` width, `size2` height, `fill` token | 96 × 96 |
+| `line` | rounded-end stroke, separator or accent | `size` length, `size2` thickness 1–16, `fill` token | 128 × 4 |
 | `dialog` | dialog | `label` title, `supporting` body, `icon` | 312 × 220, centered |
 | `snackbar` | snackbar | `label`, `supporting` action label | 344 × 48 |
 | `textField` | text field | `label`, `supporting` helper, `icon`, `variant` `outlined / filled` | 380 × 56 |

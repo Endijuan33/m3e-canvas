@@ -509,6 +509,8 @@ export const KIND_TEXT: Record<
 > = {
   ja: {
     box: { noun: "ボックス" },
+    ellipse: { noun: "楕円" },
+    line: { noun: "線" },
     button: { noun: "ボタン", label: "ボタン" },
     iconButton: { noun: "アイコンボタン" },
     fab: { noun: "FAB（フローティングボタン）" },
@@ -544,6 +546,8 @@ export const KIND_TEXT: Record<
   },
   en: {
     box: { noun: "box" },
+    ellipse: { noun: "ellipse" },
+    line: { noun: "line" },
     button: { noun: "button", label: "Button" },
     iconButton: { noun: "icon button" },
     fab: { noun: "FAB" },
@@ -579,6 +583,8 @@ export const KIND_TEXT: Record<
   },
   zh: {
     box: { noun: "容器框" },
+    ellipse: { noun: "椭圆" },
+    line: { noun: "线条" },
     button: { noun: "按钮", label: "按钮" },
     iconButton: { noun: "图标按钮" },
     fab: { noun: "FAB（悬浮按钮）" },
@@ -614,6 +620,8 @@ export const KIND_TEXT: Record<
   },
   ko: {
     box: { noun: "상자" },
+    ellipse: { noun: "타원" },
+    line: { noun: "선" },
     button: { noun: "버튼", label: "버튼" },
     iconButton: { noun: "아이콘 버튼" },
     fab: { noun: "FAB" },

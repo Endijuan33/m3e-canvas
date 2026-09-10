@@ -357,6 +357,20 @@ describe("makeItem", () => {
     expect(box.radiusTop).toBe(28);
     expect(box.radiusBottom).toBe(28);
   });
+
+  it("an ellipse and a line carry their shape defaults and sizes", () => {
+    const ellipse = makeItem("ellipse");
+    expect(ellipse.size).toBe(96);
+    expect(ellipse.size2).toBe(96);
+    expect(ellipse.fill).toBe("secondaryContainer");
+    expect(sizeOf(ellipse, {})).toEqual({ w: 96, h: 96 });
+    const line = makeItem("line");
+    expect(line.size).toBe(128);
+    expect(line.size2).toBe(4);
+    expect(line.fill).toBe("primary");
+    expect(sizeOf(line, {})).toEqual({ w: 128, h: 4 });
+    expect(sizeOf({ ...line, size: 200, size2: 8 }, {})).toEqual({ w: 200, h: 8 });
+  });
 });
 
 describe("card image placement helpers", () => {

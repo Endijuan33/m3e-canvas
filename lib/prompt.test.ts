@@ -357,3 +357,32 @@ describe("scrollable tab rows in the prompt", () => {
     expect(buildPrompt(doc(5), {}, undefined, lang)).not.toContain(marker[lang]);
   });
 });
+
+describe("the ellipse and line parts in the prompt", () => {
+  const doc = (): Doc => ({
+    title: "T", brief: "", paletteKey: "purple", frame: "phone", platform: "web",
+    frames: [{ id: "f", name: "Home", x: 0, y: 0 }],
+    groups: [
+      { id: "g-ellipse", x: 16, y: 200, axis: "x", items: [{ ...makeItem("ellipse"), id: "dot" }] },
+      { id: "g-line", x: 16, y: 300, axis: "x", items: [{ ...makeItem("line"), id: "rule", size: 200, size2: 8, fill: "tertiaryContainer" }] },
+    ],
+  });
+  const described: Record<Lang, string[]> = {
+    ja: ["96×96dp の楕円（背景 secondaryContainer）", "長さ 200dp・太さ 8dp の線（色 tertiaryContainer）"],
+    en: ["a 96×96dp ellipse (fill secondaryContainer)", "a 200dp line, 8dp thick (color tertiaryContainer)"],
+    zh: ["96×96dp 的椭圆（填充 secondaryContainer）", "长 200dp、粗 8dp 的线条（颜色 tertiaryContainer）"],
+    ko: ["96×96dp 타원(채움 secondaryContainer)", "길이 200dp·두께 8dp 선(색 tertiaryContainer)"],
+  };
+  const noted: Record<Lang, string[]> = {
+    ja: ["楕円: 指定した色で塗りつぶした", "線: 指定した色と太さの線"],
+    en: ["Ellipses: flat oval shapes", "Lines: strokes of the given token"],
+    zh: ["椭圆：用指定颜色填充", "线条：指定颜色和粗细的线"],
+    ko: ["타원: 지정된 토큰으로 채운", "선: 지정된 토큰과 두께의 선"],
+  };
+
+  it.each(LANGS)("describes both shapes and their style notes in %s", (lang) => {
+    setGlobalLang(lang);
+    const prompt = buildPrompt(doc(), {}, undefined, lang);
+    for (const text of [...described[lang], ...noted[lang]]) expect(prompt).toContain(text);
+  });
+});

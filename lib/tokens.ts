@@ -445,6 +445,8 @@ export function variantShadow(v: Variant): string {
 /* ---------- component kinds ---------- */
 export type Kind =
   | "box"
+  | "ellipse"
+  | "line"
   | "button"
   | "iconButton"
   | "fab"
@@ -549,6 +551,44 @@ export const KIND_SPEC: Record<Kind, KindSpec> = {
     defLabel: "",
     defIcon: null,
     defSize: PHONE_W,
+  },
+  ellipse: {
+    label: "Ellipse",
+    noun: "楕円",
+    category: "containment",
+    paletteIcon: "circle",
+    w: 96,
+    h: 96,
+    radius: 0,
+    hasVariant: false,
+    hasLabel: false,
+    hasSupporting: false,
+    hasIcon: false,
+    hasFill: true,
+    size: { min: 16, max: PHONE_W, step: 4, icon: "width" },
+    size2: { min: 16, max: PHONE_H, step: 4, icon: "height" },
+    defLabel: "",
+    defIcon: null,
+    defSize: 96,
+  },
+  line: {
+    label: "Line",
+    noun: "線",
+    category: "containment",
+    paletteIcon: "horizontal_rule",
+    w: 128,
+    h: 4,
+    radius: 0,
+    hasVariant: false,
+    hasLabel: false,
+    hasSupporting: false,
+    hasIcon: false,
+    hasFill: true,
+    size: { min: 8, max: PHONE_W, step: 4, icon: "width", presets: WIDTH_PRESETS },
+    size2: { min: 1, max: 16, step: 1, icon: "height" },
+    defLabel: "",
+    defIcon: null,
+    defSize: 128,
   },
   button: {
     label: "Button",
@@ -1136,6 +1176,8 @@ export const KIND_ORDER: Kind[] = [
   "card",
   "listItem",
   "box",
+  "ellipse",
+  "line",
   "dialog",
   "snackbar",
   "textField",
@@ -1709,6 +1751,14 @@ export function makeItem(kind: Kind): Item {
     it.radiusBottom = 28;
     it.fill = "surfaceContainerHigh";
   }
+  if (kind === "ellipse") {
+    it.size2 = 96;
+    it.fill = "secondaryContainer";
+  }
+  if (kind === "line") {
+    it.size2 = 4;
+    it.fill = "primary";
+  }
   if (kind === "slider") it.value = 40;
   if (kind === "bottomNav") {
     it.tabs = defaultTabs();
@@ -1789,6 +1839,8 @@ export function sizeOf(it: Item, widths: Record<string, number>) {
     case "card":
       return { w: n, h: it.size2 ?? Math.round(n * 0.5875) };
     case "box":
+    case "ellipse":
+    case "line":
       return { w: n, h: it.size2 ?? s.h };
     case "navRail":
       return { w: railWidth(it), h: it.size2 ?? s.h };

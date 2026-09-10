@@ -205,6 +205,10 @@ function itemJa(it: Item): string {
       return "区切り線";
     case "box":
       return `${it.size ?? PHONE_W}×${it.size2 ?? 220}dp の${it.checked ? "ボトムシート（上部にドラッグハンドル。" : "ボックス（"}背景 ${it.fill ?? "surfaceContainerLow"}、${boxCorners(it, "ja")}）`;
+    case "ellipse":
+      return `${it.size ?? 96}×${it.size2 ?? 96}dp の楕円（背景 ${it.fill ?? "secondaryContainer"}）`;
+    case "line":
+      return `長さ ${it.size ?? 128}dp・太さ ${it.size2 ?? 4}dp の線（色 ${it.fill ?? "primary"}）`;
     case "loadingIndicator":
       return `M3 Expressive の形が変化するローディングインジケータ${it.contained ? "（コンテナ付き）" : ""}`;
     case "linearProgress":
@@ -296,6 +300,10 @@ function itemEn(it: Item): string {
       return "a divider";
     case "box":
       return `a ${it.size ?? PHONE_W}×${it.size2 ?? 220}dp ${it.checked ? "bottom sheet with a drag handle at the top" : "box"} (background ${it.fill ?? "surfaceContainerLow"}, ${boxCorners(it, "en")})`;
+    case "ellipse":
+      return `a ${it.size ?? 96}×${it.size2 ?? 96}dp ellipse (fill ${it.fill ?? "secondaryContainer"})`;
+    case "line":
+      return `a ${it.size ?? 128}dp line, ${it.size2 ?? 4}dp thick (color ${it.fill ?? "primary"})`;
     case "loadingIndicator":
       return `the M3 Expressive shape-morphing loading indicator${it.contained ? " (contained)" : ""}`;
     case "linearProgress":
@@ -387,6 +395,10 @@ function itemZh(it: Item): string {
       return "分割线";
     case "box":
       return `${it.size ?? PHONE_W}×${it.size2 ?? 220}dp 的${it.checked ? "底部面板（顶部带拖动条，" : "容器框（"}背景 ${it.fill ?? "surfaceContainerLow"}，${boxCorners(it, "zh")}）`;
+    case "ellipse":
+      return `${it.size ?? 96}×${it.size2 ?? 96}dp 的椭圆（填充 ${it.fill ?? "secondaryContainer"}）`;
+    case "line":
+      return `长 ${it.size ?? 128}dp、粗 ${it.size2 ?? 4}dp 的线条（颜色 ${it.fill ?? "primary"}）`;
     case "loadingIndicator":
       return `M3 Expressive 形状变化的加载指示器${it.contained ? "（带容器）" : ""}`;
     case "linearProgress":
@@ -458,6 +470,8 @@ function itemKo(it: Item): string {
     case "map": return `${viewSize(it, 3 / 4)} 지도`;
     case "divider": return "구분선";
     case "box": return `${it.size ?? PHONE_W}×${it.size2 ?? 220}dp ${it.checked ? "하단 시트(위쪽 드래그 핸들 포함)" : "상자"}(배경 ${it.fill ?? "surfaceContainerLow"}, ${boxCorners(it, "ko")})`;
+    case "ellipse": return `${it.size ?? 96}×${it.size2 ?? 96}dp 타원(채움 ${it.fill ?? "secondaryContainer"})`;
+    case "line": return `길이 ${it.size ?? 128}dp·두께 ${it.size2 ?? 4}dp 선(색 ${it.fill ?? "primary"})`;
     case "loadingIndicator": return `M3 Expressive 형태 변환 로딩 표시기${it.contained ? "(컨테이너 포함)" : ""}`;
     case "linearProgress": return `${it.wavy ? "물결 모양 " : ""}선형 진행 표시기(${it.value === undefined ? "불확정" : `${it.value}%`}${progressThickness(it) !== 4 ? `, 트랙 두께 ${progressThickness(it)}dp` : ""})`;
     case "circularProgress": return `${it.wavy ? "물결 모양 " : ""}원형 진행 표시기(${it.value === undefined ? "불확정" : `${it.value}%`}${progressThickness(it) !== 4 ? `, 트랙 두께 ${progressThickness(it)}dp` : ""})`;
@@ -930,6 +944,8 @@ const STYLE_NOTES: Record<Lang, Partial<Record<Kind | "boxSheet", string>>> = {
     map: "地図: 角丸 20dp。地図 SDK のビューをこの領域に置き、読み込み中は surfaceContainerHighest に地図アイコンを置く。",
     divider: "区切り線: 1dp の outlineVariant、左右に 16dp の余白。",
     box: "ボックス: 指定した背景色と角丸を持つ単なるコンテナ。中に重ねる部品の背景として使い、独自の挙動は付けない。",
+    ellipse: "楕円: 指定した色で塗りつぶした楕円形の図形。装飾やアクセントとして使い、独自の挙動は付けない。",
+    line: "線: 指定した色と太さの線。区切りや強調に使い、独自の挙動は付けない。",
     boxSheet:
       "ボックス / ボトムシート: 指定した背景色と角丸を持つコンテナ。ドラッグハンドル付きと書いたものだけはモーダルボトムシート（ModalBottomSheet）として下から出し、それ以外のボックスは単なる背景コンテナにする。",
     loadingIndicator:
@@ -979,6 +995,8 @@ const STYLE_NOTES: Record<Lang, Partial<Record<Kind | "boxSheet", string>>> = {
     map: "Map: 20dp corners. Place the map SDK view in this area; while it loads, show a map icon on surfaceContainerHighest.",
     divider: "Dividers: 1dp outlineVariant with 16dp horizontal insets.",
     box: "Boxes: plain containers with the specified background token and corner radii. They are the background for whatever is layered on them and have no behavior of their own.",
+    ellipse: "Ellipses: flat oval shapes filled with the given token, for decoration and accents; no behavior of their own.",
+    line: "Lines: strokes of the given token and thickness, for separators and accents; no behavior of their own.",
     boxSheet:
       "Boxes / bottom sheets: containers with the specified background token and corner radii. Only the ones described with a drag handle are modal bottom sheets that slide up from the bottom; every other box is a plain background container.",
     loadingIndicator:
@@ -1027,6 +1045,8 @@ const STYLE_NOTES: Record<Lang, Partial<Record<Kind | "boxSheet", string>>> = {
     map: "地图：圆角 20dp。在此区域放置地图 SDK 视图；加载期间在 surfaceContainerHighest 上显示地图图标。",
     divider: "分割线：1dp 的 outlineVariant，左右留 16dp 边距。",
     box: "容器框：只是带指定背景色和圆角的容器，作为叠放在其上的组件的背景，本身没有任何行为。",
+    ellipse: "椭圆：用指定颜色填充的椭圆形，用于装饰和强调，本身没有行为。",
+    line: "线条：指定颜色和粗细的线，用于分隔和强调，本身没有行为。",
     boxSheet: "容器框／底部面板：带指定背景色和圆角的容器。只有描述中带拖动条的才做成从底部滑出的模态底部面板（ModalBottomSheet），其余容器框只是普通的背景容器。",
     loadingIndicator: "加载指示：使用 M3 Expressive 形状变化的 LoadingIndicator（旋转并在多边形之间变形）。带容器的放在 secondaryContainer 的圆形中。",
     linearProgress: "线性进度条：使用指定的轨道粗细（未指定则为 4dp）和圆形端帽。指定波浪形时使用 M3 Expressive 的 wavy 样式。轨道为 secondaryContainer，进度为 primary。",
@@ -1066,6 +1086,8 @@ const STYLE_NOTES: Record<Lang, Partial<Record<Kind | "boxSheet", string>>> = {
     map: "지도: 모서리 20dp. 이 영역에 지도 SDK 뷰를 두고, 불러오는 동안은 surfaceContainerHighest 위에 지도 아이콘을 둔다.",
     divider: "구분선: 1dp outlineVariant, 좌우 여백 16dp.",
     box: "상자: 지정된 배경 토큰과 모서리를 가진 단순 컨테이너. 겹쳐 놓은 부품의 배경으로 사용하며 자체 동작은 넣지 않는다.",
+    ellipse: "타원: 지정된 토큰으로 채운 타원형 도형. 장식과 강조에 쓰며 자체 동작은 넣지 않는다.",
+    line: "선: 지정된 토큰과 두께의 선. 구분과 강조에 쓰며 자체 동작은 넣지 않는다.",
     boxSheet: "상자/하단 시트: 지정된 배경과 모서리를 가진 컨테이너. 드래그 핸들이 명시된 것만 아래에서 올라오는 ModalBottomSheet로 만들고 나머지는 단순 배경 컨테이너로 둔다.",
     loadingIndicator: "로딩: 다각형이 회전하며 형태가 바뀌는 M3 Expressive LoadingIndicator를 사용한다. 컨테이너형은 secondaryContainer 원 안에 둔다.",
     linearProgress: "선형 진행 표시기: 지정된 트랙 두께(지정이 없으면 4dp)와 둥근 끝을 사용한다. 지정된 경우 M3 Expressive 물결 스타일을 사용하며 트랙은 secondaryContainer, 진행은 primary로 표시한다.",
