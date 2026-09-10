@@ -41,6 +41,8 @@ const validGroup = (group: unknown) =>
   Number.isFinite(group.y) &&
   (group.axis === "x" || group.axis === "y") &&
   (group.locked === undefined || typeof group.locked === "boolean") &&
+  (group.rot === undefined || Number.isFinite(group.rot)) &&
+  (group.opacity === undefined || (Number.isFinite(group.opacity) && (group.opacity as number) >= 0 && (group.opacity as number) <= 100)) &&
   Array.isArray(group.items) &&
   group.items.length > 0 &&
   group.items.every(validItem);

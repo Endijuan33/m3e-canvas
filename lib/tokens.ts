@@ -1546,6 +1546,12 @@ export function groupBounds(g: Group, widths: Record<string, number>) {
   return { l, t, r, b };
 }
 
+/** where a hand-made group turns around: the centre of its bounds, in the group's own coordinates */
+export function groupPivotOf(g: Group, widths: Record<string, number>) {
+  const b = groupBounds(g, widths);
+  return `${(b.l + b.r) / 2 - g.x}px ${(b.t + b.b) / 2 - g.y}px`;
+}
+
 /** A free group written as the runs it holds: parts of one family that still sit
  *  one GAP apart along their axis stay a connected run, everything else is a run
  *  of one. Layout logic, the prompt and ungrouping all see the same runs, in the
@@ -1628,6 +1634,10 @@ export type Group = {
   /** a hand-made group: parts keep their own offsets (in `pos`) and move as one layer */
   free?: boolean;
   pos?: Record<string, { x: number; y: number }>;
+  /** a hand-made group drawn at an angle: clockwise degrees, turned around its centre */
+  rot?: number;
+  /** a hand-made group's transparency in percent of its own, 100 when unset */
+  opacity?: number;
 };
 
 export type FrameMode = "blank" | "phone";

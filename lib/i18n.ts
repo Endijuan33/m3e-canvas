@@ -263,6 +263,8 @@ export const UI = {
   group: { ja: "グループ", en: "Group", zh: "组" },
   makeGroup: { ja: "グループ化", en: "Group", zh: "编组" },
   ungroup: { ja: "グループ解除", en: "Ungroup", zh: "取消编组" },
+  rotation: { ja: "回転", en: "Rotation", zh: "旋转" },
+  opacity: { ja: "不透明度", en: "Opacity", zh: "不透明度" },
   selectedParts: { ja: "個を選択中", en: "selected", zh: "个已选中" },
   groupHint: {
     ja: "重なりを保ったまま、ひとつのレイヤーとして一緒に動かせます",
@@ -471,7 +473,7 @@ export const KO: Record<UIKey, string> = {
   screenWidth: "화면 너비", contentWidth: "좌우 16dp 여백", halfWidth: "한 행의 절반(2열)", screenHeight: "화면 높이", halfHeight: "화면의 절반",
   tapTo: "탭하여 이동", none: "없음", goBack: "뒤로", swipeTo: "스와이프하여 이동", toggle: "토글 버튼", toggleHint: "탭할 때 켜짐/꺼짐 전환",
   thumbCheck: "켜졌을 때 체크 아이콘 표시", behavior: "동작", whenPressed: "눌렀을 때…", whatItDoes: "이 부품의 동작…", removeLink: "링크 제거",
-  group: "그룹", makeGroup: "그룹화", ungroup: "그룹 해제", selectedParts: "개 선택됨", groupHint: "겹침을 유지한 채 하나의 레이어처럼 함께 이동합니다",
+  group: "그룹", makeGroup: "그룹화", ungroup: "그룹 해제", rotation: "회전", opacity: "불투명도", selectedParts: "개 선택됨", groupHint: "겹침을 유지한 채 하나의 레이어처럼 함께 이동합니다",
   iconBackground: "아이콘 배경", noBackground: "배경 없음", normalState: "기본", onState: "켜짐", onStateHint: "켜졌을 때의 텍스트, 아이콘, 스타일",
   groupEditNote: "안쪽 부품을 편집하려면 그룹을 해제하세요", openPanel: "패널 열기", colors: "색상", templates: "팔레트", customColor: "사용자 지정",
   seedColor: "기준 색상", seedHint: "색상 하나로 전체 Material 3 색상 구성을 만듭니다. 세부 조정에서 개별 색상도 바꿀 수 있습니다.",

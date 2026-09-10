@@ -43,6 +43,7 @@ import {
   GAP,
   Group,
   groupBounds,
+  groupPivotOf,
   Item,
   Kind,
   KIND_ORDER,
@@ -2624,17 +2625,30 @@ export default function Page() {
       >
         {gs.map((g) =>
           g.free ? (
-            ((corners) =>
-            layoutOf(g, widths).map((pl) => (
-              <div key={pl.item.id} style={{ position: "absolute", left: pl.x - f.x, top: pl.y - f.y, zIndex: modalRailOf(g) ? 2 : undefined }}>
-                <M3Static
-                  item={pl.item}
-                  palette={p}
-                  radii={corners.get(pl.item.id)}
-                  style={MEASURED.includes(pl.item.kind) ? undefined : { width: pl.w, height: pl.h }}
-                />
-              </div>
-            )))(freeRadii(g, widths))
+            <div
+              key={g.id}
+              style={{
+                position: "absolute",
+                left: g.x - f.x,
+                top: g.y - f.y,
+                zIndex: modalRailOf(g) ? 2 : undefined,
+                transform: g.rot ? `rotate(${g.rot}deg)` : undefined,
+                opacity: g.opacity !== undefined && g.opacity < 100 ? g.opacity / 100 : undefined,
+                transformOrigin: groupPivotOf(g, widths),
+              }}
+            >
+              {((corners) =>
+                layoutOf(g, widths).map((pl) => (
+                  <div key={pl.item.id} style={{ position: "absolute", left: pl.x - g.x, top: pl.y - g.y }}>
+                    <M3Static
+                      item={pl.item}
+                      palette={p}
+                      radii={corners.get(pl.item.id)}
+                      style={MEASURED.includes(pl.item.kind) ? undefined : { width: pl.w, height: pl.h }}
+                    />
+                  </div>
+                )))(freeRadii(g, widths))}
+            </div>
           ) : (
           <div
             key={g.id}
@@ -3049,6 +3063,22 @@ export default function Page() {
     setGroups((prev) => prev.map((g) => (g.id === id ? { ...g, locked: !g.locked } : g)));
   };
 
+  /** sets a hand-made group's angle or transparency; a default value drops the field from the file */
+  const patchGroupStyle = useCallback(
+    (id: string, patch: { rot?: number; opacity?: number }) => {
+      snapshotFor("groupStyle:" + id);
+      setGroups((gs) =>
+        gs.map((g) => {
+          if (g.id !== id) return g;
+          const rot = patch.rot !== undefined ? (patch.rot === 0 ? undefined : patch.rot) : g.rot;
+          const opacity = patch.opacity !== undefined ? (patch.opacity === 100 ? undefined : patch.opacity) : g.opacity;
+          return { ...g, ...(rot !== undefined && { rot }), ...(opacity !== undefined && { opacity }) };
+        }),
+      );
+    },
+    [snapshotFor],
+  );
+
   /** The parts of one group in a new order: reading order for a connected run, back to
    *  front for a free group. Inside a free group a hidden run keeps its slots, handed out
    *  again in the new order, so reordering a list really moves its rows. */
@@ -3087,9 +3117,9 @@ export default function Page() {
         <motion.div
           key={g.id}
           initial={false}
-          animate={{ x: g.x - ox, y: g.y - oy }}
+          animate={{ x: g.x - ox, y: g.y - oy, rotate: g.rot ?? 0, opacity: g.opacity === undefined ? 1 : g.opacity / 100 }}
           transition={instantG ? INSTANT : OPEN}
-          style={{ position: "absolute", left: 0, top: 0, zIndex: modalRail ? 2 : undefined }}
+          style={{ position: "absolute", left: 0, top: 0, zIndex: modalRail ? 2 : undefined, transformOrigin: groupPivotOf(g, widths) }}
         >
           {layoutOf(g, widths).map((pl) => (
             <div key={pl.item.id} style={{ position: "absolute", left: pl.x - g.x, top: pl.y - g.y }}>
@@ -4096,6 +4126,8 @@ export default function Page() {
                   onAlign={alignSelected}
                   multi={selectedIds.length}
                   grouped={!!selectedGroup}
+                  groupStyle={selectedGroup ? { rot: selectedGroup.rot, opacity: selectedGroup.opacity } : undefined}
+                  onGroupStyle={selectedGroup ? (patch) => patchGroupStyle(selectedGroup.id, patch) : undefined}
                   onGroup={groupSelected}
                   onUngroup={ungroupSelected}
                 />

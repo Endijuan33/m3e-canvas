@@ -65,6 +65,26 @@ describe("isProject", () => {
     expect(isProject({ ...value, groups: [{ ...value.groups[0], ...patch }] })).toBe(false);
   });
 
+  it.each([undefined, -180, -90, 45.5, 180])("accepts a hand-made group rotation of %s", (rot) => {
+    const value = doc();
+    expect(isProject({ ...value, groups: [{ ...value.groups[0], rot }] })).toBe(true);
+  });
+
+  it.each([null, "45", NaN, Infinity])("rejects a hand-made group rotation of %j", (rot) => {
+    const value = doc();
+    expect(isProject({ ...value, groups: [{ ...value.groups[0], rot }] })).toBe(false);
+  });
+
+  it.each([undefined, 0, 40, 100])("accepts a hand-made group opacity of %s", (opacity) => {
+    const value = doc();
+    expect(isProject({ ...value, groups: [{ ...value.groups[0], opacity }] })).toBe(true);
+  });
+
+  it.each([-1, 100.5, null, "50", NaN])("rejects a hand-made group opacity of %j", (opacity) => {
+    const value = doc();
+    expect(isProject({ ...value, groups: [{ ...value.groups[0], opacity }] })).toBe(false);
+  });
+
   it("checks every group, frame and item, not only the first", () => {
     const value = doc();
     expect(isProject({ ...value, groups: [...value.groups, null] })).toBe(false);

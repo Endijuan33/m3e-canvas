@@ -29,6 +29,7 @@ import {
   freeRadii,
   frameRadius,
   frameSizeOf,
+  groupPivotOf,
   groupsInFrame,
   isPhoneFrame,
   normalizeTheme,
@@ -589,7 +590,15 @@ function Screen({
           inert={hasModal && !g.items.some((it) => modalIds.has(it.id))}
           style={
             g.free
-              ? { position: "absolute", left: g.x - frame.x, top: g.y - frame.y, zIndex: g.items.some((it) => modalIds.has(it.id)) ? 4 : g.items.some((it) => it.id === menuId) ? 2 : undefined }
+              ? {
+                  position: "absolute",
+                  left: g.x - frame.x,
+                  top: g.y - frame.y,
+                  zIndex: g.items.some((it) => modalIds.has(it.id)) ? 4 : g.items.some((it) => it.id === menuId) ? 2 : undefined,
+                  transform: g.rot ? `rotate(${g.rot}deg)` : undefined,
+                  opacity: g.opacity !== undefined && g.opacity < 100 ? g.opacity / 100 : undefined,
+                  transformOrigin: groupPivotOf(g, widths),
+                }
               : {
                   position: "absolute",
                   left: g.x - frame.x,

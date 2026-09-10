@@ -623,6 +623,8 @@ export function Inspector({
   onGroup,
   onUngroup,
   onAlign,
+  groupStyle,
+  onGroupStyle,
 }: {
   /** the AI button beside the behavior field */
   ai: AiHooks;
@@ -643,6 +645,10 @@ export function Inspector({
   onUngroup?: () => void;
   /** lines the selected parts up with each other, or spaces them evenly */
   onAlign?: (kind: AlignKind) => void;
+  /** the selected hand-made group's own angle and transparency */
+  groupStyle?: { rot?: number; opacity?: number };
+  /** sets them on the selected hand-made group */
+  onGroupStyle?: (patch: { rot?: number; opacity?: number }) => void;
 }) {
   const lang = useLang();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -707,6 +713,12 @@ export function Inspector({
             <IconBtn icon="delete" p={p} danger onClick={onDelete} title={t("deleteSelection", lang)} size={32} />
           </div>
           {onAlign && <AlignSection single={false} onAlign={onAlign} p={p} />}
+          {grouped && onGroupStyle && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "2px 6px 12px" }}>
+              <Slider icon="rotate_right" title={t("rotation", lang)} value={groupStyle?.rot ?? 0} min={-180} max={180} step={1} unit="°" onChange={(v) => onGroupStyle({ rot: v })} p={p} />
+              <Slider icon="opacity" title={t("opacity", lang)} value={groupStyle?.opacity ?? 100} min={0} max={100} step={1} unit="%" onChange={(v) => onGroupStyle({ opacity: v })} p={p} />
+            </div>
+          )}
           {grouped ? bigBtn("ungroup", t("ungroup", lang), onUngroup) : bigBtn("group_work", t("makeGroup", lang), onGroup)}
           <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.5, color: p.onSurfaceVariant, padding: "0 6px" }}>
             {grouped ? t("groupEditNote", lang) : `${t("groupHint", lang)} (Ctrl+G)`}
