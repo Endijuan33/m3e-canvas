@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 # Read-only: this also runs on pull requests from forks.
 permissions:
