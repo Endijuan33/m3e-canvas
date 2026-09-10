@@ -8,13 +8,20 @@ import { Lang } from "./i18n";
  * prompt and a fixed JSON answer shape, and the result is only applied after the
  * author has looked at it. Coordinates are never touched by the model. */
 
-export type Provider = "claude" | "openai" | "gemini" | "deepseek";
+export type Provider = "claude" | "openai" | "gemini" | "deepseek" | "custom";
+
+/** the request shape a custom endpoint speaks */
+export type Protocol = "openai" | "anthropic";
 
 export type AiSettings = {
   provider: Provider;
   baseUrl: string;
   model: string;
   key: string;
+  /** the wire format of a custom endpoint; the named providers decide this themselves */
+  protocol: Protocol;
+  /** send Claude Code CLI's own client headers, for endpoints that only serve coding agents */
+  spoof: boolean;
 };
 
 export const PROVIDERS: { key: Provider; label: string; baseUrl: string; model: string; keysUrl?: string }[] = [
@@ -22,11 +29,12 @@ export const PROVIDERS: { key: Provider; label: string; baseUrl: string; model: 
   { key: "claude", label: "Claude", baseUrl: "https://api.anthropic.com", model: "claude-sonnet-5", keysUrl: "https://console.anthropic.com/settings/keys" },
   { key: "gemini", label: "Gemini", baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-3.8-flash", keysUrl: "https://aistudio.google.com/apikey" },
   { key: "deepseek", label: "DeepSeek", baseUrl: "https://api.deepseek.com/v1", model: "deepseek-v4-flash", keysUrl: "https://platform.deepseek.com/api_keys" },
+  { key: "custom", label: "Custom", baseUrl: "", model: "" },
 ];
 
 export const providerSpec = (k: Provider) => PROVIDERS.find((p) => p.key === k) ?? PROVIDERS[0];
 
-export const DEFAULT_AI: AiSettings = { provider: PROVIDERS[0].key, baseUrl: PROVIDERS[0].baseUrl, model: PROVIDERS[0].model, key: "" };
+export const DEFAULT_AI: AiSettings = { provider: PROVIDERS[0].key, baseUrl: PROVIDERS[0].baseUrl, model: PROVIDERS[0].model, key: "", protocol: "openai", spoof: false };
 
 const STORE_KEY = "m3e:ai";
 
@@ -40,6 +48,8 @@ export function loadAiSettings(): AiSettings {
       if (typeof v.baseUrl === "string") s.baseUrl = v.baseUrl;
       if (typeof v.model === "string") s.model = v.model;
       if (typeof v.key === "string") s.key = v.key;
+      if (v.protocol === "anthropic") s.protocol = v.protocol;
+      if (v.spoof === true) s.spoof = true;
     }
   } catch {}
   return s;
@@ -62,6 +72,11 @@ export const isSecureUrl = (u: string) => /^https:\/\//i.test(u.trim()) || isLoc
 
 const trimSlash = (u: string) => u.trim().replace(/\/+$/, "");
 
+/** Claude Code CLI's own client headers, for endpoints that only serve coding agents. The
+ *  browser drops the user-agent line itself when the request leaves, but x-app and the beta
+ *  flag still say who is calling, and the relays that gate on the CLI look for those. */
+const CLI_HEADERS = { "user-agent": "claude-cli/2.1.0 (external, cli)", "x-app": "cli" } as Record<string, string>;
+
 async function readError(res: Response): Promise<string> {
   let detail = "";
   try {
@@ -79,9 +94,12 @@ async function readError(res: Response): Promise<string> {
 export async function complete(s: AiSettings, system: string, user: string, signal?: AbortSignal, maxTokens = 4096): Promise<string> {
   const base = trimSlash(s.baseUrl);
   const model = s.model.trim();
+  if (!base) throw new Error("endpoint");
   if (!model) throw new Error("model");
   if (!isSecureUrl(base)) throw new Error("insecure");
-  if (s.provider === "claude") {
+  const spoof = s.provider === "custom" && s.spoof;
+  const anthropic = s.provider === "claude" || (s.provider === "custom" && s.protocol === "anthropic");
+  if (anthropic) {
     const res = await fetch(`${base}/v1/messages`, {
       method: "POST",
       signal,
@@ -90,6 +108,7 @@ export async function complete(s: AiSettings, system: string, user: string, sign
         "x-api-key": s.key.trim(),
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true",
+        ...(spoof && { ...CLI_HEADERS, "anthropic-beta": "claude-code-20250219" }),
       },
       body: JSON.stringify({ model, max_tokens: Math.min(maxTokens, 8192), system, messages: [{ role: "user", content: user }] }),
     });
@@ -104,6 +123,7 @@ export async function complete(s: AiSettings, system: string, user: string, sign
   }
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (s.key.trim()) headers.authorization = `Bearer ${s.key.trim()}`;
+  if (spoof) Object.assign(headers, CLI_HEADERS);
   const res = await fetch(`${base}/chat/completions`, {
     method: "POST",
     signal,

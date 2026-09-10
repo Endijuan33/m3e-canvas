@@ -3,8 +3,9 @@
 import { useRef } from "react";
 import { Palette } from "@/lib/tokens";
 import { t, useLang } from "@/lib/i18n";
-import { AiSettings, PROVIDERS, Provider, providerSpec } from "@/lib/ai";
+import { AiSettings, PROVIDERS, Provider, Protocol, providerSpec } from "@/lib/ai";
 import { Icon } from "./M3Node";
+import { Segmented, Toggle } from "./ui";
 
 /** the message shown for a failed request, mapped from the error codes lib/ai throws */
 export function aiErrorText(e: unknown, lang: ReturnType<typeof useLang>): string {
@@ -12,6 +13,7 @@ export function aiErrorText(e: unknown, lang: ReturnType<typeof useLang>): strin
   if (m === "refusal") return t("aiErrorRefusal", lang);
   if (m === "json" || m === "empty") return t("aiErrorJson", lang);
   if (m === "model") return t("aiErrorModel", lang);
+  if (m === "endpoint") return t("aiErrorEndpoint", lang);
   if (m === "insecure") return t("aiErrorInsecure", lang);
   if (/failed to fetch|networkerror|load failed/i.test(m)) return t("aiErrorNetwork", lang);
   return `${t("aiError", lang)}: ${m}`;
@@ -177,13 +179,33 @@ export function AiPanel({ p, settings, onSettings }: { p: Palette; settings: AiS
             <Label p={p}>{t("aiProvider", lang)}</Label>
             <ProviderGroup value={settings.provider} onChange={pick} p={p} />
           </div>
+          {settings.provider === "custom" && (
+            <>
+              <div>
+                <Label p={p}>{t("aiProtocol", lang)}</Label>
+                <Segmented<Protocol>
+                  options={[
+                    { key: "openai", label: t("aiOpenaiCompatible", lang) },
+                    { key: "anthropic", label: t("aiAnthropicCompatible", lang) },
+                  ]}
+                  value={settings.protocol}
+                  onChange={(protocol) => onSettings({ ...settings, protocol })}
+                  p={p}
+                />
+              </div>
+              <div>
+                <Toggle on={settings.spoof} onChange={(spoof) => onSettings({ ...settings, spoof })} p={p} icon="terminal" label={t("aiSpoof", lang)} grow />
+                <div style={{ fontSize: 12, lineHeight: 1.5, color: p.onSurfaceVariant, marginTop: 8, padding: "0 4px" }}>{t("aiSpoofHint", lang)}</div>
+              </div>
+            </>
+          )}
           <div>
             <Label p={p}>{t("aiModel", lang)}</Label>
             <Input label={t("aiModel", lang)} value={settings.model} onChange={(model) => onSettings({ ...settings, model })} placeholder={spec.model || "model"} p={p} />
           </div>
           <div>
             <Label p={p}>{t("aiBaseUrl", lang)}</Label>
-            <Input label={t("aiBaseUrl", lang)} value={settings.baseUrl} onChange={(baseUrl) => onSettings({ ...settings, baseUrl })} placeholder={spec.baseUrl} p={p} />
+            <Input label={t("aiBaseUrl", lang)} value={settings.baseUrl} onChange={(baseUrl) => onSettings({ ...settings, baseUrl })} placeholder={spec.baseUrl || "https://your-endpoint.example/v1"} p={p} />
           </div>
           <div>
             <Label

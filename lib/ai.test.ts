@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { complete, hasKey, isSecureUrl, type AiSettings, type Provider } from "./ai";
 
 const settings = (over: Partial<AiSettings> = {}): AiSettings =>
-  ({ provider: "openai", baseUrl: "https://api.example.test", model: "test-model", key: "test-key", ...over });
+  ({ provider: "openai", baseUrl: "https://api.example.test", model: "test-model", key: "test-key", protocol: "openai", spoof: false, ...over });
 
 const jsonResponse = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 
@@ -107,8 +107,62 @@ describe("complete on the openai-compatible path", () => {
   });
 });
 
+describe("complete on the custom path", () => {
+  it("speaks the anthropic protocol to a custom endpoint with the standard headers", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ content: [{ type: "text", text: "hi" }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    const s = settings({ provider: "custom", protocol: "anthropic", baseUrl: "https://relay.example.test" });
+    await expect(complete(s, "sys", "user")).resolves.toBe("hi");
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://relay.example.test/v1/messages");
+    expect(init.headers).toEqual({
+      "content-type": "application/json",
+      "x-api-key": "test-key",
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    });
+    expect(JSON.parse(init.body)).toMatchObject({ model: "test-model", max_tokens: 4096, system: "sys" });
+  });
+
+  it("speaks the openai protocol with a bearer token and a token budget", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ choices: [{ finish_reason: "stop", message: { content: "ok" } }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    const s = settings({ provider: "custom", baseUrl: "https://relay.example.test/v1" });
+    await expect(complete(s, "sys", "user")).resolves.toBe("ok");
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://relay.example.test/v1/chat/completions");
+    expect(init.headers).toEqual({ "content-type": "application/json", authorization: "Bearer test-key" });
+    expect(JSON.parse(init.body).max_tokens).toBe(4096);
+  });
+
+  it("carries the Claude Code CLI client headers when asked, on either protocol", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ content: [{ type: "text", text: "hi" }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(complete(settings({ provider: "custom", protocol: "anthropic", spoof: true }), "s", "u")).resolves.toBe("hi");
+    expect(fetchMock.mock.calls[0][1].headers).toMatchObject({
+      "user-agent": "claude-cli/2.1.0 (external, cli)",
+      "x-app": "cli",
+      "anthropic-beta": "claude-code-20250219",
+    });
+
+    const openai = vi.fn().mockResolvedValue(jsonResponse({ choices: [{ message: { content: "ok" } }] }));
+    vi.stubGlobal("fetch", openai);
+    await expect(complete(settings({ provider: "custom", spoof: true }), "s", "u")).resolves.toBe("ok");
+    expect(openai.mock.calls[0][1].headers).toMatchObject({ "user-agent": "claude-cli/2.1.0 (external, cli)", "x-app": "cli" });
+    expect(openai.mock.calls[0][1].headers).not.toHaveProperty("anthropic-beta");
+  });
+
+  it("leaves the named providers on their standard headers even with the toggle on", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ choices: [{ message: { content: "ok" } }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(complete(settings({ provider: "openai", spoof: true }), "s", "u")).resolves.toBe("ok");
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ "content-type": "application/json", authorization: "Bearer test-key" });
+  });
+});
+
 describe("complete input guards", () => {
   it.each([
+    ["endpoint", { baseUrl: "  " }],
     ["insecure", { baseUrl: "http://api.example.test" }],
     ["model", { model: "  " }],
   ])("rejects %s without calling fetch", async (message, over) => {

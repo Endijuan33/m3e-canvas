@@ -406,6 +406,11 @@ export const UI = {
   aiSettings: { ja: "AI の設定", en: "AI settings", zh: "AI 设置" },
   aiProvider: { ja: "プロバイダ", en: "Provider", zh: "服务商" },
   aiBaseUrl: { ja: "ベース URL", en: "Base URL", zh: "基础 URL" },
+  aiProtocol: { ja: "プロトコル", en: "Protocol", zh: "协议" },
+  aiOpenaiCompatible: { ja: "OpenAI 互換", en: "OpenAI compatible", zh: "OpenAI 兼容" },
+  aiAnthropicCompatible: { ja: "Anthropic 互換", en: "Anthropic compatible", zh: "Anthropic 兼容" },
+  aiSpoof: { ja: "Claude Code CLI のクライアントヘッダーを送る", en: "Send Claude Code CLI client headers", zh: "发送 Claude Code CLI 客户端标头" },
+  aiSpoofHint: { ja: "コーディングエージェントのみを対象とするエンドポイントに有用です。主な AI 機能を提供するプロバイダーではオフのままにしてください", en: "Useful for endpoints that only serve coding agents; leave it off for providers that already serve general AI clients", zh: "适用于只服务编程代理的端点；对已支持普通 AI 客户端的提供商请保持关闭", },
   aiModel: { ja: "モデル ID", en: "Model ID", zh: "模型 ID" },
   aiKey: { ja: "API キー", en: "API key", zh: "API 密钥" },
   aiGetKey: { ja: "キーを取得", en: "Get a key", zh: "获取密钥" },
@@ -423,6 +428,7 @@ export const UI = {
   aiErrorJson: { ja: "モデルの返答を読み取れませんでした", en: "The model's reply could not be read", zh: "无法解析模型的回复" },
   aiErrorLong: { ja: "返答が長すぎて途中で切れました。画面を減らして試してください", en: "The reply was cut short. Try fewer screens", zh: "回复过长被截断了。请减少屏幕数量再试" },
   aiErrorModel: { ja: "モデル ID を入力してください", en: "Enter a model ID", zh: "请输入模型 ID" },
+  aiErrorEndpoint: { ja: "エンドポイント URL を入力してください", en: "Enter the endpoint URL", zh: "请输入端点 URL" },
   aiErrorInsecure: { ja: "ベース URL は https か localhost にしてください", en: "The base URL must use https or point at localhost", zh: "基础 URL 必须使用 https 或指向 localhost" },
   aiErrorNetwork: {
     ja: "接続できませんでした。URL、ネットワーク、CORS の設定を確認してください",
@@ -493,9 +499,11 @@ export const KO: Record<UIKey, string> = {
   tidy: "정리", tidyUndo: "정리 실행 취소", tidyDone: "이미 정돈되어 있습니다", placement: "본문의 세로 배치", placeTop: "위에서부터", placeCenter: "가운데", placeBottom: "아래쪽", placeSpread: "균등", align: "정렬", alignHintOne: "화면 본문 영역(바와 레일을 제외한 여백 안쪽)에 맞춰 정렬합니다.", alignHintMany: "선택한 부품끼리 정렬합니다. 균등 배치는 양끝 부품을 고정합니다.", alignLeft: "왼쪽 정렬", alignCenterH: "가로 가운데 정렬", alignRight: "오른쪽 정렬", distributeH: "가로 균등 배치", alignTop: "위쪽 정렬", alignCenterV: "세로 가운데 정렬", alignBottom: "아래쪽 정렬", distributeV: "세로 균등 배치", description: "설명", screenDescription: "이 화면의 용도",
   ai: "AI", promptReset: "생성된 프롬프트로 되돌리기", aiWriteShort: "AI로 작성", aiWrite: "AI에게 작성 맡기기", aiSettings: "AI 설정",
   aiProvider: "제공업체", aiBaseUrl: "기본 URL", aiModel: "모델 ID", aiKey: "API 키", aiGetKey: "키 받기",
+  aiProtocol: "프로토콜", aiOpenaiCompatible: "OpenAI 호환", aiAnthropicCompatible: "Anthropic 호환",
+  aiSpoof: "Claude Code CLI 클라이언트 헤더 보내기", aiSpoofHint: "코딩 에이전트만 허용하는 엔드포인트에 유용합니다. 일반 AI 클라이언트를 지원하는 공급자에서는 끄세요",
   aiKeyHint: "키는 이 브라우저에만 저장되며 제공업체로 직접 전송됩니다.", aiRestore: "AI 수정본과 원본 전환", aiApplied: "적용됨",
   aiSelectScreen: "먼저 화면을 선택하세요", aiNoKey: "AI 탭에 키를 입력하면 사용할 수 있습니다", aiError: "AI 요청에 실패했습니다",
-  aiErrorRefusal: "모델이 답변을 거부했습니다", aiErrorJson: "모델의 응답을 읽을 수 없습니다", aiErrorLong: "답변이 너무 길어 중간에 잘렸습니다. 화면 수를 줄여 다시 시도하세요", aiErrorModel: "모델 ID를 입력하세요",
+  aiErrorRefusal: "모델이 답변을 거부했습니다", aiErrorJson: "모델의 응답을 읽을 수 없습니다", aiErrorLong: "답변이 너무 길어 중간에 잘렸습니다. 화면 수를 줄여 다시 시도하세요", aiErrorModel: "모델 ID를 입력하세요", aiErrorEndpoint: "엔드포인트 URL을 입력하세요",
   aiErrorInsecure: "기본 URL은 https를 사용하거나 localhost를 가리켜야 합니다", aiErrorNetwork: "연결할 수 없습니다. URL, 네트워크 및 서버의 CORS 설정을 확인하세요",
 };
 
