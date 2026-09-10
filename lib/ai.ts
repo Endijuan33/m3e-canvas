@@ -114,7 +114,9 @@ export async function complete(s: AiSettings, system: string, user: string, sign
         "anthropic-dangerous-direct-browser-access": "true",
         ...(spoof && { ...CLI_HEADERS, "anthropic-beta": "claude-code-20250219" }),
       },
-      body: JSON.stringify({ model, max_tokens: Math.min(maxTokens, 8192), system, messages: [{ role: "user", content: user }] }),
+      /* Claude-style endpoints take large budgets, and a reasoning relay can spend half of one
+       * thinking before the reply itself; the chat-completions wire below still caps around 8k */
+      body: JSON.stringify({ model, max_tokens: Math.min(maxTokens, 16384), system, messages: [{ role: "user", content: user }] }),
     });
     if (!res.ok) throw new Error(await readError(res));
     const j = await res.json();
