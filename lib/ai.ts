@@ -106,6 +106,10 @@ export async function complete(s: AiSettings, system: string, user: string, sign
       headers: {
         "content-type": "application/json",
         "x-api-key": s.key.trim(),
+        /* relays set up as Claude Code endpoints hand out tokens that ride as a bearer
+         * (ANTHROPIC_AUTH_TOKEN), so a custom endpoint gets the key both ways; the
+         * named endpoint accepts either and its own path stays untouched */
+        ...(s.provider === "custom" && s.key.trim() && { authorization: `Bearer ${s.key.trim()}` }),
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true",
         ...(spoof && { ...CLI_HEADERS, "anthropic-beta": "claude-code-20250219" }),

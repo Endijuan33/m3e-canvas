@@ -118,6 +118,7 @@ describe("complete on the custom path", () => {
     expect(init.headers).toEqual({
       "content-type": "application/json",
       "x-api-key": "test-key",
+      authorization: "Bearer test-key",
       "anthropic-version": "2023-06-01",
       "anthropic-dangerous-direct-browser-access": "true",
     });
@@ -143,6 +144,7 @@ describe("complete on the custom path", () => {
       "user-agent": "claude-cli/2.1.0 (external, cli)",
       "x-app": "cli",
       "anthropic-beta": "claude-code-20250219",
+      authorization: "Bearer test-key",
     });
 
     const openai = vi.fn().mockResolvedValue(jsonResponse({ choices: [{ message: { content: "ok" } }] }));
